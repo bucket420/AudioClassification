@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+import json
 
 def get_spectrogram(waveform):
   # Convert the waveform to a spectrogram via a STFT.
@@ -26,3 +27,7 @@ def plot_spectrogram(spectrogram, ax):
   X = np.linspace(0, np.size(spectrogram), num=width, dtype=int)
   Y = range(height)
   ax.pcolormesh(X, Y, log_spec)
+  
+def save_as_json(data, path):
+  with open(path, 'w') as f:
+    json.dump(data, f, ensure_ascii=False)
