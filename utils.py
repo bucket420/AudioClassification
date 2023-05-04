@@ -1,6 +1,8 @@
 import tensorflow as tf
 import numpy as np
+import matplotlib.pyplot as plt
 import json
+from IPython import display
 
 def get_spectrogram(waveform):
   # Convert the waveform to a spectrogram via a STFT.
@@ -13,6 +15,15 @@ def get_spectrogram(waveform):
   # shape (`batch_size`, `height`, `width`, `channels`).
   spectrogram = spectrogram[..., tf.newaxis]
   return spectrogram
+
+def plot_waveform(waveform, ax):
+  if len(waveform.shape) > 1:
+    waveform = np.squeeze(waveform, axis=-1)
+  # Plot the waveform.
+  ax.plot(np.arange(waveform.shape[0]), waveform)
+  # Label the axes.
+  ax.set_title('Waveform')
+
 
 def plot_spectrogram(spectrogram, ax):
   if len(spectrogram.shape) > 2:
@@ -27,7 +38,32 @@ def plot_spectrogram(spectrogram, ax):
   X = np.linspace(0, np.size(spectrogram), num=width, dtype=int)
   Y = range(height)
   ax.pcolormesh(X, Y, log_spec)
+  ax.set_title('Spectrogram')
+  
+def plot_data(waveform, spectrogram, src, instr):
+  fig, axes = plt.subplots(2, figsize=(10, 8))
+  plot_waveform(waveform, axes[0])
+  plot_spectrogram(spectrogram, axes[1])
+  plt.suptitle(src + " " + instr)
+  plt.show()
   
 def save_as_json(data, path):
   with open(path, 'w') as f:
     json.dump(data, f, ensure_ascii=False)
+    
+def predict(model, audio, classes):
+  display.display(display.Audio(audio.numpy(), rate=16000))
+  input_data = audio
+  if len(model.get_config()["layers"][0]["config"]["batch_input_shape"]) == 4:
+    input_data = get_spectrogram(audio)
+  input_data = tf.expand_dims(input_data, axis=0)
+  prediction = tf.nn.softmax(model.predict(input_data)[0])
+  print("Predicted class: " + classes[np.argmax(prediction)])
+  fig = plt.figure(figsize=(10, 5))
+  plt.bar(classes, prediction)
+  plt.title('Prediction')
+  plt.tight_layout()
+  plt.show()
+  return classes[np.argmax(prediction)]
+  
+  
