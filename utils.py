@@ -82,6 +82,6 @@ def predict(model, audio, classes):
   plt.ylabel('Confidence')
   plt.tight_layout()
   plt.show()
-  return classes[np.argmax(prediction)]
+  return prediction
   
   
