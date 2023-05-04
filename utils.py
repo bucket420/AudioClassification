@@ -51,6 +51,22 @@ def save_as_json(data, path):
   with open(path, 'w') as f:
     json.dump(data, f, ensure_ascii=False)
     
+def plot_history(history):
+  fig, axs = plt.subplots(1, 2, figsize=(12, 4))
+  axs[0].plot(history['accuracy'])
+  axs[0].plot(history['val_accuracy'])
+  axs[0].set_title('Accuracy')
+  axs[0].set_ylabel('Accuracy')
+  axs[0].set_xlabel('Epoch')
+  axs[0].legend(['Train', 'Test'], loc='upper left')
+  axs[1].plot(history['loss'])
+  axs[1].plot(history['val_loss'])
+  axs[1].set_title('Loss')
+  axs[1].set_ylabel('Loss')
+  axs[1].set_xlabel('Epoch')
+  axs[1].legend(['Train', 'Test'], loc='upper left')
+  plt.show()
+    
 def predict(model, audio, classes):
   display.display(display.Audio(audio.numpy(), rate=16000))
   input_data = audio
@@ -62,6 +78,8 @@ def predict(model, audio, classes):
   fig = plt.figure(figsize=(10, 5))
   plt.bar(classes, prediction)
   plt.title('Prediction')
+  plt.xlabel('Class')
+  plt.ylabel('Confidence')
   plt.tight_layout()
   plt.show()
   return classes[np.argmax(prediction)]
